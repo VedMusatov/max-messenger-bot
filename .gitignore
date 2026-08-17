@@ -298,3 +298,51 @@ docs/build/
 *.model
 *.weights
 *.data
+
+# ВРЕМЕННЫЕ ФАЙЛЫ HERMES (ВАЖНО!)
+.hermes-tmp.*
+hermes-tmp.*
+tmp.*
+temp.*
+*.tmp
+*.temp
+
+# Файлы логирования
+*.log
+log/
+logs/
+
+# Временные файлы разработки
+.development/
+.staging/
+.production/
+
+# Файлы аудио (временные)
+recordings/
+audio_temp/
+voice_temp/
+
+# Файлы изображений (временные)
+image_temp/
+photo_temp/
+
+# Файлы сессий
+sessions/
+.session/
+
+# Файлы кэша
+.cache/
+__pycache__/
+*.pyc
+
+# Файлы базы данных
+*.db
+*.sqlite
+*.sqlite3
+databases/
+
+# Файлы конфигурации
+config.*
+settings.*
+*.conf
+*.ini

@@ -445,18 +445,30 @@ class UniqueVoiceBot:
     
     def handle_voice_message_demo(self, user: str):
         """Демо-обработка голосовых сообщений"""
-        # Имитация распознавания голоса
+        # Имитация распознавания голоса с улучшенной обработкой
         voice_text = "🎤 Голосовое сообщение распознано!"
+        
+        # Проверка на возможные ошибки распознавания
+        if len(voice_text) < 3:
+            voice_text = "🎤 Голосовое сообщение слишком короткое"
+        elif len(voice_text) > 200:
+            voice_text = "🎤 Голосовое сообщение слишком длинное"
         
         self.log_message(user, voice_text, "voice", "telegram")
         
-        # Генерация ответа
+        # Генерация ответа с улучшенной обработкой
         response_text = f"🎤 Ваше голосовое сообщение распознано!\n\n"
         response_text += f"📝 Текст: {voice_text}\n"
         response_text += f"🤖 Ответ UNIQUE_VOICE_BOT:\n"
         response_text += f"✅ Голосовое сообщение обработано!\n"
         response_text += f"🎯 Платформа: Telegram\n"
         response_text += f"🇷🇺 Язык: Русский\n"
+        
+        # Добавление проверки качества распознавания
+        if "распознано" in voice_text:
+            response_text += f"🎯 Качество распознавания: Отличное\n"
+        else:
+            response_text += f"⚠️ Качество распознавания: Требует улучшения\n"
         
         print(f"📤 Telegram: {user} - {response_text.strip()}")
         

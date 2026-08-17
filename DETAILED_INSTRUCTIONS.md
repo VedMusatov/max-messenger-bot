@@ -29,8 +29,8 @@
 Открой файл `.env` и добавь:
 
 ```env
-# Max Messenger API Configuration
-MAX_MESSENGER_API_URL=https://maxmessenger.com/api
+# Max Messenger API Configurationmaxmessenger.com
+MAX_MESSENGER_API_URL=https:///api
 MAX_MESSENGER_BOT_URL=https://maxmessenger.com/bot
 
 # Bot Authentication

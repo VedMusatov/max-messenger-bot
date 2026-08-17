@@ -1,0 +1,300 @@
+# .gitignore для UNIQUE VOICE BOT проекта
+# Исключаем все личные настройки, временные файлы и секреты
+
+# Временные файлы и кэш
+*.log
+*.tmp
+*.temp
+*.cache
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.git
+.mypy_cache
+.pytest_cache/
+.hypothesis/
+
+# Файлы окружения и секреты
+.env
+.env.local
+.env.*.local
+.env.production
+.env.staging
+.env.development
+config.ini
+config.local.ini
+secrets.json
+tokens.json
+api_keys.txt
+bot_token.txt
+telegram_token.txt
+max_messenger_token.txt
+
+# Личные настройки и временные данные
+*.env.*
+*.conf
+*.conf.*
+*.settings
+*.settings.*
+*.config
+*.config.*
+
+# Временные файлы бота
+bot.log
+unique_voice_bot*.log
+github_logs.json
+*.db
+*.sqlite
+*.sqlite3
+
+# Системные файлы
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE и редактор
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Файлы проекта (если нужно исключить определенные)
+node_modules/
+dist/
+build/
+out/
+
+# Файлы бота (если нужно)
+*.bot
+*.model
+*.weights
+*.data
+
+# Временные аудио файлы
+*.wav
+*.mp3
+*.ogg
+*.m4a
+audio_files/
+voice_files/
+
+# Временные изображения
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+images/
+temp_images/
+
+# Бэкапы
+*.bak
+*.backup
+backups/
+
+# Системные файлы Windows
+Thumbs.db
+desktop.ini
+
+# Файлы локальной конфигурации
+local_config.py
+local_settings.py
+dev_config.py
+prod_config.py
+
+# Файлы тестов (если не нужно деплоить)
+test_*.py
+*_test.py
+tests/
+test_data/
+
+# Документация (если не нужно)
+docs/_build/
+docs/build/
+
+# Файлы сборки
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Файлы виртуального окружения
+venv/
+venv.bak/
+.venv/
+
+# Файлы зависимостей
+Pipfile.lock
+package-lock.json
+yarn.lock
+poetry.lock
+
+# Файлы миграций (если есть)
+migrations/
+*.sql
+
+# Файлы данных
+data/
+datasets/
+*.csv
+*.json
+*.xml
+*.yaml
+*.yml
+
+# Файлы моделей
+models/
+*.h5
+*.hdf5
+*.pkl
+*.pickle
+
+# Файлы обучения
+checkpoints/
+logs_tensorboard/
+wandb/
+
+# Файлы документации
+README.md
+docs/
+*.md
+
+# Исключаем файлы, которые не должны попадать в GitHub
+.env
+*.env
+*.log
+*.tmp
+*.temp
+*.cache
+__pycache__/
+.venv/
+venv/
+env/
+pip-log.txt
+coverage.xml
+*.cover
+.git
+.mypy_cache
+.pytest_cache/
+.hypothesis/
+
+# Файлы проекта UNIQUE VOICE BOT
+unique_voice_bot*.log
+github_logs.json
+*.db
+*.sqlite
+*.sqlite3
+bot.log
+config.ini
+secrets.json
+tokens.json
+api_keys.txt
+*.env.*
+
+# Личные настройки
+local_config.py
+local_settings.py
+dev_config.py
+prod_config.py
+*.conf
+*.config
+
+# Временные файлы
+*.wav
+*.mp3
+*.ogg
+*.m4a
+audio_files/
+voice_files/
+*.png
+*.jpg
+*.jpeg
+*.gif
+images/
+temp_images/
+*.bak
+*.backup
+backups/
+
+# Системные файлы
+.DS_Store
+._*
+Thumbs.db
+desktop.ini
+
+# Файлы тестов
+test_*.py
+*_test.py
+tests/
+test_data/
+
+# Файлы сборки
+dist/
+build/
+out/
+*.egg-info/
+*.egg
+
+# Файлы зависимостей
+Pipfile.lock
+package-lock.json
+yarn.lock
+poetry.lock
+
+# Файлы данных
+data/
+datasets/
+*.csv
+*.json
+*.xml
+*.yaml
+*.yml
+
+# Файлы моделей
+models/
+*.h5
+*.hdf5
+*.pkl
+*.pickle
+
+# Файлы обучения
+checkpoints/
+logs_tensorboard/
+wandb/
+
+# Файлы документации (если не нужно)
+docs/_build/
+docs/build/
+
+# Файлы локальной разработки
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Файлы бота
+*.bot
+*.model
+*.weights
+*.data

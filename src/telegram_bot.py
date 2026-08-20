@@ -1,216 +1,122 @@
 import logging
-from telegram.ext import Updater, CommandHandler, MessageHandler, CallbackContext, filters
-from telegram import Update, Bot
-from typing import Optional
+from typing import Callable
+from telegram import Update
+from telegram.ext import (
+    Application,
+    CommandHandler,
+    MessageHandler,
+    filters,
+    ContextTypes,
+)
+
 from .config import Config
 
 logger = logging.getLogger(__name__)
 
+
 class TelegramBot:
-    """Telegram бот для голосового общения"""
-    
     def __init__(self):
         self.token = Config.TELEGRAM_BOT_TOKEN
-        self.chat_id = Config.TELEGRAM_CHAT_ID
-        self.bot = Bot(token=self.token)
-        self.updater = None
-        
-        if not self.token or not self.chat_id:
-            logger.error("Telegram bot token or chat ID not configured")
-            raise ValueError("Telegram bot configuration incomplete")
-    
-    def start(self):
-        """Запуск Telegram бота"""
-        try:
-            self.updater = Updater(token=self.token, use_context=True)
-            
-            # Добавляем обработчики
-            dispatcher = self.updater.dispatcher
-            
-            # Команды
-            dispatcher.add_handler(CommandHandler("start", self.start_command))
-            dispatcher.add_handler(CommandHandler("help", self.help_command))
-            
-            # Обработка текстовых сообщений
-            dispatcher.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, self.text_message))
-            
-            # Обработка голосовых сообщений
-            dispatcher.add_handler(MessageHandler(filters.VOICE, self.voice_message))
-            
-            # Обработка фото
-            dispatcher.add_handler(MessageHandler(filters.PHOTO, self.photo_message))
-            
-            # Обработка ошибок
-            dispatcher.add_error_handler(self.error_handler)
-            
-            logger.info("✅ Telegram bot started successfully")
-            
-        except Exception as e:
-            logger.error(f"Error starting Telegram bot: {e}")
-            raise
-    
-    def start_command(self, update: Update, context: CallbackContext):
-        """Обработка команды /start"""
-        try:
-            welcome_message = f"""
-🤖 {Config.BOT_NAME}
-Версия: {Config.BOT_VERSION}
+        self.default_chat_id = Config.TELEGRAM_CHAT_ID
+        self.app = None
+        self._on_message = None
 
-Я бот для мессенджера Max Messenger с поддержкой голосового общения!
+    def build(self, on_message: Callable):
+        self._on_message = on_message
+        self.app = Application.builder().token(self.token).build()
 
-📱 Функции:
-• Отправка сообщений в Max Messenger
-• Прием сообщений из Max Messenger
-• Голосовое общение
-• Обработка фото
+        self.app.add_handler(CommandHandler("start", self._cmd_start))
+        self.app.add_handler(CommandHandler("help", self._cmd_help))
+        self.app.add_handler(CommandHandler("status", self._cmd_status))
+        self.app.add_handler(
+            MessageHandler(filters.TEXT & ~filters.COMMAND, self._on_text)
+        )
+        self.app.add_handler(
+            MessageHandler(filters.VOICE | filters.AUDIO, self._on_voice)
+        )
 
-🔧 Команды:
-• /help - помощь
-• /status - статус бота
-• /test - тестовое сообщение
-            """
-            
-            update.message.reply_text(welcome_message)
-            logger.info(f"Sent welcome message to {update.message.chat_id}")
-            
-        except Exception as e:
-            logger.error(f"Error in start_command: {e}")
-    
-    def help_command(self, update: Update, context: CallbackContext):
-        """Обработка команды /help"""
-        try:
-            help_message = """
-📚 Помощь по боту Max Messenger
-
-🔧 Основные команды:
-• /start - начать работу
-• /help - эта справка
-• /status - текущий статус
-• /test - отправить тестовое сообщение
-
-💬 Формат сообщений:
-• Просто отправьте текстовое сообщение - оно будет переслано в Max Messenger
-• Отправьте голосовое сообщение - оно будет преобразовано в текст
-• Отправьте фото - оно будет сохранено и переслано
-
-🎯 Интеграция:
-• Бот работает с Max Messenger
-• Поддерживает голосовое общение
-• Логирует все сообщения
-            """
-            
-            update.message.reply_text(help_message)
-            logger.info(f"Sent help message to {update.message.chat_id}")
-            
-        except Exception as e:
-            logger.error(f"Error in help_command: {e}")
-    
-    def text_message(self, update: Update, context: CallbackContext):
-        """Обработка текстовых сообщений"""
-        try:
-            text = update.message.text
-            chat_id = update.message.chat_id
-            
-            logger.info(f"Received text message from {chat_id}: {text}")
-            
-            # Здесь можно добавить логику отправки в Max Messenger
-            # Пока просто отправляем подтверждение
-            response = f"✅ Получено сообщение: {text}"
-            update.message.reply_text(response)
-            
-        except Exception as e:
-            logger.error(f"Error in text_message: {e}")
-            update.message.reply_text("❌ Произошла ошибка при обработке сообщения")
-    
-    def voice_message(self, update: Update, context: CallbackContext):
-        """Обработка голосовых сообщений"""
-        try:
-            voice_file = update.message.voice
-            chat_id = update.message.chat_id
-            
-            logger.info(f"Received voice message from {chat_id}")
-            
-            # Получаем файл голосового сообщения
-            voice_file_info = voice_file.get_file()
-            voice_url = voice_file_info.file_path
-            
-            # Здесь можно добавить логику распознавания речи
-            # Пока просто отправляем подтверждение
-            response = f"✅ Получено голосовое сообщение\\nДлительность: {voice_file.duration} секунд"
-            update.message.reply_text(response)
-            
-        except Exception as e:
-            logger.error(f"Error in voice_message: {e}")
-            update.message.reply_text("❌ Произошла ошибка при обработке голосового сообщения")
-    
-    def photo_message(self, update: Update, context: CallbackContext):
-        """Обработка фото сообщений"""
-        try:
-            photo_file = update.message.photo[-1]  # Получаем фото наилучшего качества
-            chat_id = update.message.chat_id
-            
-            logger.info(f"Received photo message from {chat_id}")
-            
-            # Получаем файл фото
-            photo_file_info = photo_file.get_file()
-            photo_url = photo_file_info.file_path
-            
-            # Здесь можно добавить логику обработки фото
-            # Пока просто отправляем подтверждение
-            response = f"✅ Получено фото\\nРазмер: {photo_file.width}x{photo_file.height}"
-            update.message.reply_text(response)
-            
-        except Exception as e:
-            logger.error(f"Error in photo_message: {e}")
-            update.message.reply_text("❌ Произошла ошибка при обработке фото")
-    
-    def error_handler(self, update: Update, context: CallbackContext):
-        """Обработчик ошибок"""
-        logger.error(f"Update {update} caused error {context.error}")
-    
     def send_message(self, text: str, chat_id: str = None) -> bool:
-        """Отправка сообщения в Telegram"""
-        try:
-            target_chat_id = chat_id or self.chat_id
-            
-            self.bot.send_message(
-                chat_id=target_chat_id,
-                text=text
-            )
-            
-            logger.info(f"Message sent to {target_chat_id}")
-            return True
-            
-        except Exception as e:
-            logger.error(f"Error sending message: {e}")
+        target = chat_id or self.default_chat_id
+        if not target or not self.app or not self.app.bot:
             return False
-    
-    def send_voice(self, voice_file_path: str, chat_id: str = None) -> bool:
-        """Отправка голосового сообщения в Telegram"""
+        import asyncio
         try:
-            target_chat_id = chat_id or self.chat_id
-            
-            with open(voice_file_path, 'rb') as voice_file:
-                self.bot.send_voice(
-                    chat_id=target_chat_id,
-                    voice=voice_file
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            loop = None
+
+        if loop and loop.is_running():
+            import concurrent.futures
+            with concurrent.futures.ThreadPoolExecutor() as pool:
+                future = pool.submit(
+                    asyncio.run,
+                    self.app.bot.send_message(chat_id=target, text=text),
                 )
-            
-            logger.info(f"Voice message sent to {target_chat_id}")
+                future.result(timeout=10)
             return True
-            
-        except Exception as e:
-            logger.error(f"Error sending voice message: {e}")
-            return False
-    
-    def start_polling(self):
-        """Запуск опроса сообщений"""
-        if self.updater:
-            self.updater.start_polling()
-            logger.info("🔄 Telegram bot polling started")
-    
-    def stop(self):
-        """Остановка бота"""
-        if self.updater:
-            self.updater.stop()
-            logger.info("🛑 Telegram bot stopped")
+        else:
+            asyncio.run(self.app.bot.send_message(chat_id=target, text=text))
+            return True
+
+    async def _cmd_start(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        chat_id = update.effective_chat.id
+        user = update.effective_user
+        logger.info(f"Telegram /start from {user.first_name} (chat={chat_id})")
+
+        text = (
+            f"Привет, {user.first_name}!\n\n"
+            "Я Hermes Bridge Bot.\n"
+            "Отправляй мне сообщения — я отвечу через AI.\n"
+            "Также я синхронизирую переписку с MAX.\n\n"
+            "Команды:\n"
+            "/help — помощь\n"
+            "/status — статус бота"
+        )
+        await update.message.reply_text(text)
+
+        if self._on_message:
+            self._on_message({
+                "platform": "telegram",
+                "type": "start",
+                "chat_id": chat_id,
+                "user": user,
+                "text": "",
+            })
+
+    async def _cmd_help(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        await update.message.reply_text(
+            "Hermes Bridge Bot\n\n"
+            "Отправь текст — я отвечу с помощью AI.\n"
+            "Синхронизация: Telegram <-> MAX\n\n"
+            "/start — начать\n"
+            "/status — статус"
+        )
+
+    async def _cmd_status(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        from .config import Config as C
+        tg = "OK" if C.TELEGRAM_BOT_TOKEN else "MISSING"
+        mx = "OK" if C.MAX_BOT_TOKEN else "MISSING"
+        ai = "OK" if (C.HERMES_API_KEY or C.HERMES_PROVIDER == "local") else "MISSING"
+        await update.message.reply_text(
+            f"Статус:\nTelegram: {tg}\nMAX: {mx}\nAI ({C.HERMES_PROVIDER}): {ai}"
+        )
+
+    async def _on_text(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        text = update.message.text
+        chat_id = update.effective_chat.id
+        user = update.effective_user
+        logger.info(f"Telegram msg from {user.first_name}: {text[:80]}")
+
+        if self._on_message:
+            self._on_message({
+                "platform": "telegram",
+                "type": "message",
+                "chat_id": chat_id,
+                "user": user,
+                "text": text,
+            })
+
+    async def _on_voice(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        await update.message.reply_text(
+            "Голосовые сообщения пока не поддерживаются. Отправь текстом."
+        )

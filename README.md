@@ -1,39 +1,57 @@
-# Max Messenger Bot
+# Hermes Bridge Bot
 
-Бот для мессенджера Max Messenger с поддержкой голосового общения в Telegram.
+AI-бот-мост между Telegram и MAX мессенджером. Сообщения из обеих платформ обрабатываются AI-агентом (Hermes) и синхронизируются.
 
-## 📋 Описание проекта
+## Быстрый старт
 
-Проект создания бота для мессенджера Max Messenger с интеграцией голосового общения через Telegram.
+```bash
+cp .env.example .env
+# Заполните .env своими токенами
+pip install -r requirements.txt
+python main.py
+```
 
-## 🎯 Функционал
+## Docker
 
-- Обработка сообщений в Max Messenger
-- Голосовое общение через Telegram
-- Автоматические ответы
-- Логирование сообщений
+```bash
+docker-compose up --build
+```
 
-## 📁 Структура проекта
+## Конфигурация (.env)
+
+| Переменная | Описание |
+|-----------|----------|
+| `TELEGRAM_BOT_TOKEN` | Токен Telegram-бота (от @BotFather) |
+| `MAX_BOT_TOKEN` | Токен MAX-бота (с business.max.ru) |
+| `HERMES_PROVIDER` | AI провайдер: `openrouter`, `openai`, `claude`, `local` |
+| `HERMES_API_KEY` | API ключ провайдера |
+| `HERMES_MODEL` | Модель AI |
+
+## Провайдеры AI
+
+- **openrouter** — агрегатор моделей (OpenAI-совместимый)
+- **openai** — напрямую OpenAI API
+- **claude** — Anthropic Claude API
+- **local** — локальный сервер (Ollama, LM Studio, etc.)
+
+## Архитектура
 
 ```
-max-messenger-bot/
+Telegram → Bot → Hermes AI → ответ → Telegram + MAX
+MAX → Bot → Hermes AI → ответ → MAX + Telegram
+```
+
+## Структура
+
+```
+├── main.py            # Точка входа
 ├── src/
-│   ├── bot.py          # Основной файл бота
-│   ├── telegram_bot.py  # Telegram интеграция
-│   └── config.py       # Конфигурация
-├── requirements.txt    # Зависимости
-├── README.md          # Документация
-└── .env               # Переменные окружения
+│   ├── config.py      # Конфигурация
+│   ├── max_api.py     # MAX API клиент
+│   ├── telegram_bot.py # Telegram бот
+│   ├── hermes_agent.py # AI-агент
+│   └── sync.py        # Синхронизация
+├── .env.example       # Шаблон
+├── Dockerfile
+└── docker-compose.yml
 ```
-
-## 🚀 Технологии
-
-- Python 3.x
-- requests
-- python-telegram-bot
-- dotenv
-
-## 📝 Текущий статус
-
-✅ Этап 1: Исследование мессенджера "Макс" - ЗАВЕРШЕН
-🔄 Этап 2: Разработка архитектуры бота - В ПРОЦЕССЕ
